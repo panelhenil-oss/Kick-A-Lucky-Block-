@@ -1,0 +1,154 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "KickALuckyBlockMenu"
+screenGui.ResetOnSpawn = false
+screenGui.DisplayOrder = 999  -- UVEK ISPRED SVEGA
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 260, 0, 145)
+frame.Position = UDim2.new(0.5, -130, 0.5, -72)
+frame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+frame.BorderSizePixel = 0
+frame.ZIndex = 10
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = frame
+
+-- Title bar
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 32)
+titleBar.Position = UDim2.new(0, 0, 0, 0)
+titleBar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+titleBar.BorderSizePixel = 0
+titleBar.ZIndex = 11
+titleBar.Parent = frame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.Parent = titleBar
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -30, 1, 0)
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "KICK A LUCKY BLOCK SCRIPT — Update Required"
+titleLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
+titleLabel.TextSize = 11
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.ZIndex = 12
+titleLabel.Parent = titleBar
+
+-- X close button
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 22, 0, 22)
+close.Position = UDim2.new(1, -26, 0, 5)
+close.BackgroundTransparency = 1
+close.Text = "X"
+close.TextColor3 = Color3.fromRGB(220, 220, 220)
+close.TextSize = 13
+close.Font = Enum.Font.GothamBold
+close.ZIndex = 12
+close.Parent = titleBar
+
+close.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- DRAG SISTEM (radi i na mobitelu i na racunaru)
+local dragging = false
+local dragStartPos = nil
+local frameStartPos = nil
+
+local function startDrag(input)
+    dragging = true
+    dragStartPos = input.Position
+    frameStartPos = frame.Position
+end
+
+local function updateDrag(input)
+    if not dragging then return end
+    local delta = input.Position - dragStartPos
+    frame.Position = UDim2.new(
+        frameStartPos.X.Scale,
+        frameStartPos.X.Offset + delta.X,
+        frameStartPos.Y.Scale,
+        frameStartPos.Y.Offset + delta.Y
+    )
+end
+
+local function stopDrag()
+    dragging = false
+end
+
+-- Podrska za mis i touch (mobilni)
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 
+    or input.UserInputType == Enum.UserInputType.Touch then
+        startDrag(input)
+    end
+end)
+
+titleBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 
+    or input.UserInputType == Enum.UserInputType.Touch then
+        stopDrag()
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement 
+    or input.UserInputType == Enum.UserInputType.Touch then
+        updateDrag(input)
+    end
+end)
+
+-- Subtitle
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, -20, 0, 44)
+subtitle.Position = UDim2.new(0, 10, 0, 38)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Press the button below to copy the update link.\nA browser must open for the link to work."
+subtitle.TextColor3 = Color3.fromRGB(160, 160, 160)
+subtitle.TextSize = 11
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextWrapped = true
+subtitle.TextXAlignment = Enum.TextXAlignment.Left
+subtitle.ZIndex = 11
+subtitle.Parent = frame
+
+-- Copy Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1, -20, 0, 32)
+button.Position = UDim2.new(0, 10, 0, 100)
+button.BackgroundColor3 = Color3.fromRGB(40, 160, 60)
+button.BorderSizePixel = 0
+button.Text = "Copy Update Link"
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.TextSize = 12
+button.Font = Enum.Font.GothamBold
+button.ZIndex = 11
+button.Parent = frame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 7)
+btnCorner.Parent = button
+
+local link = "https://link-center.net/1239053/LsCaHYxhHUkb"
+
+button.MouseButton1Click:Connect(function()
+    setclipboard(link)
+    button.Text = "Copied!"
+    button.BackgroundColor3 = Color3.fromRGB(40, 180, 80)
+    task.wait(2)
+    button.Text = "Copy Update Link"
+    button.BackgroundColor3 = Color3.fromRGB(40, 160, 60)
+end)
